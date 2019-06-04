@@ -18,6 +18,26 @@ Ein QR-Code wird in ausreichender Größe auf dem Boden ausgebracht. Dabei repr�
 * Eine festgelegte Koordiante. Der QR-Code enthält direkt die Koordiante
 * Eine Nummer. Der QR-Code ist nummeriert und kann im Nachhinein einer Position zugeordnet werden
 
+## Mögliche Workflows
+
+### Vorhandene QR-Codes
+
+1. Bilder aufnehmen
+2. Das Python Skript sucht automatisiert auf den Bildern nach QR-Codes und erzeugt eine GCP-Tabelle
+3. Nichts mehr, das wars schon :D
+
+### OSM QR-Code verlegen
+
+**Dieser Workflow ist eine Idee, noch nicht zuende gedacht und sollte noch nicht angewendet werden!!**
+
+1. Einen Node mit WorkInProgress Tag auf der ungefähren Position erzeugen
+2. Mit der OSM Node-ID und dem QR-Code Generator einen QR-Code erzeugen
+3. Den QR-Code ausbringen (malen, drucken, pflastern, Blumen säen, usw)
+4. Die Mitte des oberen linken größen Markers möglichst genau einmessen
+5. In OSM die Position korrigieren und das WorkInProgress Tag entfernen
+
+# Spezifikation des Formats
+
 ### QR-Code Format
 
 Es wird ein QR-Code mit fester Größe von 25x25 Pixeln genutzt. Dieser kann als Daten 32 Zeichen aufnehmen. 
@@ -28,7 +48,9 @@ Als Referenzpunkt wird die Mitte des großen Positionmarkers oben links genutzt.
 
 ### URL-Schema
 
-`https://osm.to/<type indicator><payload>`
+`https://dom.an/<type indicator><payload>`
+
+**Die Doma(i)n ist noch nicht festgelegt!**
 
 Der `<type indicator>` kann folgende Wert haben:
 
@@ -43,7 +65,7 @@ Die Way, Area und Relation werden nicht als GroundControlPoints genutzt, sondern
 
 #### Länge
 
-Der Prefix bis vor den type indicator braucht 15 Zeichen. Somit bleiben noch 15 (bzw 17 für Node IDs) Zeichen für die Payload. 
+Der Prefix bis vor den `type indicator` braucht 15 Zeichen. Somit bleiben noch 15 (bzw 17 für Node IDs) Zeichen für die Payload. 
 
 OSM IDs sind 64 Bit Integer, welche zur Basis 64 maximal 11 Zeichen brauchen.
 
