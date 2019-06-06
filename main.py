@@ -1,16 +1,26 @@
 import argparse
 import os
+import zxing
 
-
-def main(args):
+def main(file):
     if os.path.isdir(args.file) == False and os.path.isfile(args.file) == False:
         print("neither file nor folder. ending programm.")
 
     if os.path.isdir(args.file) == True:
-        print("loading in all files in folder:", args.file)
+        print("loading in all files in folder:", file)
 
     elif os.path.isfile(args.file) == True:
-        print("loading in this file:", args.file)
+        print("loading in this file:", file)
+
+        reader = zxing.BarCodeReader()
+        barcode = reader.decode(file)
+
+        if barcode is not None:
+            print(barcode.format)
+            print(barcode.type)
+            print(barcode.raw)
+            print(barcode.parsed)
+            print(barcode.points)
 
 
 def getArgs():
@@ -35,4 +45,4 @@ def getArgs():
 if __name__ == '__main__':
     args = getArgs()
 
-    main(args)
+    main(args.file)
