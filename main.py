@@ -3,21 +3,7 @@ import os
 import zxing
 from pathlib import Path
 
-
-def get_all_files(filename):
-
-    processing_files = []
-    for root, dirs, files in os.walk(filename):
-        for file in files:
-            filepath = os.path.join(root, file)
-            if os.path.isfile(filepath) == True:
-                print("file", filepath)
-                processing_files.append(filepath)
-
-    return processing_files
-
-def get_one_file(filename):
-    return [filename]
+import gcposm.utils
 
 
 def get_qr_codes(processing_files):
@@ -50,15 +36,14 @@ def main(filename):
         if os.path.isdir(args.file) == True:
             print("loading in all files in folder:", filename)
 
-            processing_files = get_all_files(filename)
+            processing_files = gcposm.utils.get_all_files(filename)
 
         elif os.path.isfile(args.file) == True:
             print("loading in this file:", filename)
 
-            processing_files = get_one_file(filename)
+            processing_files = gcposm.utils.get_one_file(filename)
 
         get_qr_codes(processing_files)
-
 
 
 
@@ -80,6 +65,7 @@ def getArgs():
     #parser.add_argument('--version', action='version', version='0.0')
 
     return parser.parse_args()
+
 
 if __name__ == '__main__':
     args = getArgs()
