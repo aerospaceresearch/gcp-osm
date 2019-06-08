@@ -28,20 +28,18 @@ def get_qr_codes(processing_files):
 
 
 def main(filename):
-    if not os.path.isdir(args.file) and not os.path.isfile(args.file):
-        print("neither file nor folder. ending programm.")
+    if os.path.isdir(args.file):
+        print("loading in all files in folder:", filename)
+        processing_files = gcposm.utils.get_all_files(filename)
 
+    elif os.path.isfile(args.file):
+        print("loading in this file:", filename)
+        processing_files = gcposm.utils.get_one_file(filename)
     else:
-        processing_files = []
-        if os.path.isdir(args.file):
-            print("loading in all files in folder:", filename)
-            processing_files = gcposm.utils.get_all_files(filename)
+        print("neither file nor folder. ending programm.")
+        return
 
-        elif os.path.isfile(args.file):
-            print("loading in this file:", filename)
-            processing_files = gcposm.utils.get_one_file(filename)
-
-        get_qr_codes(processing_files)
+    get_qr_codes(processing_files)
 
 
 def getArgs():
