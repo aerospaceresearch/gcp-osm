@@ -2,6 +2,7 @@ import argparse
 import os
 import zxing
 from pathlib import Path
+import utm
 
 import gcposm.utils
 
@@ -34,7 +35,9 @@ def get_qr_codes(file):
 def main(filename):
 
     # preparation
-    gcp_list = load_your_gcp_list("gcp_list.txt")
+    gcp_list = load_your_gcp_list("my_gcp_list.txt")
+    f = open("gcp_list.txt", "w")
+    odm_gcp_header = 0
 
 
     # now working time
@@ -59,11 +62,27 @@ def main(filename):
             #do stuff now...
             for item in gcp_list:
                 if parsed == item[0]:
-                    print("\t found a known gcp (", item[1] ,"/", item[2] ,") from your list")
+                    print("\t found a known gcp (", item[1] ,"/", item[2] ,"/", item[3] ,") from your list")
+                    location_utm = utm.from_latlon(float(item[1]), float(item[2]))
+
+
+                    # OpenDroneMap GCP
+                    ## header
+                    if odm_gcp_header == 0:
+                        # this is still to understood, why ODM just allows one utm zone and that is in the header!
+                        f.write("WGS84 UTM " + str(location_utm[2]) + str(location_utm[3]) + "\n")
+                        odm_gcp_header = 1
+
+                    ## line by line saving the coordinates
+                    f.write((str(location_utm[0]) + " " + str(location_utm[1]) + " "  + item[3] + " "
+                             + str(points[1][0]) + " "  + str(points[1][1]) + " "  + file.split(os.sep)[-1])  + "\n")
 
 
         else:
             print("qr not found in", file)
+
+
+    f.close()
 
 
 def getArgs():
