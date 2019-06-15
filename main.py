@@ -6,28 +6,38 @@ from pathlib import Path
 import gcposm.utils
 
 
-def get_qr_codes(processing_files):
-    for file in processing_files:
+def load_your_gcp_list(file):
 
-        # zxing doesn't like windows separator and other strange characters, so we just change it
-        file = Path(file)
-        file = file.absolute().as_uri()
+    gcp_list = []
+    if os.path.exists(file):
+        with open(file, 'r') as infile:
+            for line in infile:
+                gcp_list.append(line.split("*")[0].split(";"))
 
-        reader = zxing.BarCodeReader()
-        barcode = reader.decode(file)
-        # does not handle exceptions yet, when the file is NOT an image
 
-        if barcode is not None:
-            print("decoding", file)
-            print(barcode.format)
-            print(barcode.type)
-            print(barcode.raw)
-            print(barcode.parsed)
-            print(barcode.points)
-            print()
+    return gcp_list
+
+
+def get_qr_codes(file):
+    # zxing doesn't like windows separator and other strange characters, so we just change it
+    file = Path(file)
+    file = file.absolute().as_uri()
+
+    reader = zxing.BarCodeReader()
+    barcode = reader.decode(file, True)
+    # filename, try_harder = True
+    # does not handle exceptions yet, when the file is NOT an image
+
+    return barcode.format, barcode.type, barcode.raw, barcode.parsed, barcode.points
 
 
 def main(filename):
+
+    # preparation
+    gcp_list = load_your_gcp_list("gcp_list.txt")
+
+
+    # now working time
     if os.path.isdir(args.file):
         print("loading in all files in folder:", filename)
         processing_files = gcposm.utils.get_all_files(filename)
@@ -35,11 +45,25 @@ def main(filename):
     elif os.path.isfile(args.file):
         print("loading in this file:", filename)
         processing_files = gcposm.utils.get_one_file(filename)
+
     else:
         print("neither file nor folder. ending programm.")
         return
 
-    get_qr_codes(processing_files)
+    for file in processing_files:
+        format, type, raw, parsed, points = get_qr_codes(file)
+
+        if format is not None:
+            print("qr found in", file, parsed)
+
+            #do stuff now...
+            for item in gcp_list:
+                if parsed == item[0]:
+                    print("\t found a known gcp (", item[1] ,"/", item[2] ,") from your list")
+
+
+        else:
+            print("qr not found in", file)
 
 
 def getArgs():
@@ -53,7 +77,7 @@ def getArgs():
 
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('-f', '--from', action='store', default="/",
+    parser.add_argument('-f', '--from', action='store', default=os.sep,
                         dest='file',
                         help='load in the file or folder')
 
