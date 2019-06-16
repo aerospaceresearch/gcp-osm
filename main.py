@@ -60,8 +60,36 @@ def main(filename):
             print("qr found in", file, parsed)
 
             #do stuff now...
+
+            ## type indicator cases
+            if parsed.find("/n/") > -1:
+                print("type indicator: n/ = OSM Node ID with Basis 64")
+
+            if parsed.find("/w/") > -1:
+                print("type indicator: w/ = OSM Way ID with Basis 64")
+
+            if parsed.find("/a/") > -1:
+                print("type indicator: a/ = OSM Area ID with Basis 64")
+
+            if parsed.find("/r/") > -1:
+                print("type indicator: r/ = OSM Relation ID with Basis 64")
+
+            if parsed.find("/g/") > -1:
+                print("type indicator: g/ = OSM Shortlink quadtiles format")
+
+            my_gcp_id = parsed
+            # when the local id was found with a type indicator, it will be replaced.
+            # otherwise the parsed text will directly be used in the next "simple locally defined payload" method.
+
+            if parsed.find("/l/") > -1:
+                print("type indicator: l/ = locally defined payload")
+                my_gcp_id = parsed.split("l/")[1]
+                print("gcp id", my_gcp_id, "in the local my_gcp_list.txt")
+
+
+            ## simple locally defined payloads
             for item in gcp_list:
-                if parsed == item[0]:
+                if my_gcp_id == item[0]:
                     print("\t found a known gcp (", item[1] ,"/", item[2] ,"/", item[3] ,") from your list")
                     location_utm = utm.from_latlon(float(item[1]), float(item[2]))
 
