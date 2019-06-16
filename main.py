@@ -126,7 +126,8 @@ def getArgs():
 
     parser.add_argument('-f', '--from', action='store', default=os.sep,
                         dest='file',
-                        help='load in the file or folder')
+                        help='load in the file or folder',
+                        required=True)
 
     # parser.add_argument('--version', action='version', version='0.0')
 
@@ -135,5 +136,6 @@ def getArgs():
 
 if __name__ == '__main__':
     args = getArgs()
+
 
     main(args.file)
