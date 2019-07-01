@@ -48,9 +48,7 @@ Als Referenzpunkt wird die Mitte des großen Positionmarkers oben links genutzt.
 
 ### URL-Schema
 
-`https://dom.an/<type indicator><payload>`
-
-**Die Doma(i)n ist noch nicht festgelegt!**
+`https://osm.to/<type indicator><payload>`
 
 Der `<type indicator>` kann folgende Wert haben:
 
