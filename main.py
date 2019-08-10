@@ -3,6 +3,7 @@ import os
 import zxing
 from pathlib import Path
 import utm
+from wand.image import Image
 
 import gcposm.utils
 
@@ -18,6 +19,39 @@ def load_your_gcp_list(file):
 
     return gcp_list
 
+def two_step_detection(file):
+    tmp_file_name = "/tmp/temporary_file.jpg"
+    img = Image(filename=file)
+    # TODO implement zbar and boundaries generation
+    edges = [[2300,766],[2018,1148],[2400,1471],[2722,1088]]
+    print("found qr code with edges: ",edges)
+    x_points = list(map(lambda item: item[0], edges))
+    y_points = list(map(lambda item: item[1], edges))
+    boundaries = [[min(x_points),min(y_points)],[max(x_points),max(y_points)]]
+    size = [boundaries[1][0] - boundaries[0][0],boundaries[1][1] - boundaries[0][1]]
+    #fraction of the QR Code size, that will be added around the boundaries for cropping
+    margin = 0.2 # 30%
+    boundaries = [[boundaries[0][0] - size[0]*margin,boundaries[0][1] - size[1]*margin],[boundaries[1][0] + size[0]*margin,boundaries[1][1] + size[1]*margin]]
+    boundaries = [list(map(lambda item: int(max([item,0])),boundaries[0])),[int(min([boundaries[1][0],img.width])),int(min([boundaries[1][1],img.height]))]]
+    print("crop to ",boundaries)
+    img.crop(boundaries[0][0],boundaries[0][1],boundaries[1][0],boundaries[1][1])
+    img.format = 'jpeg'
+    img.save(filename=tmp_file_name)
+    
+    reader = zxing.BarCodeReader()
+    barcode = reader.decode(tmp_file_name, True)
+    
+    if barcode is not None:
+        valid = barcode.format is not None and barcode.format == "QR_CODE"
+        print("decoded qr code in two step detection")
+        content = barcode.parsed
+        point = [barcode.points[1][0] + boundaries[0][0],barcode.points[1][1] + boundaries[0][1]]
+        return [[valid, content, point]]
+    else:
+        return [[False,None,None]]
+    
+    
+    
 
 def get_qr_codes(file):
     # zxing doesn't like windows separator and other strange characters, so we just change it
@@ -37,7 +71,8 @@ def get_qr_codes(file):
         point = barcode.points[1]
         return [[valid, content, point]]
     else:
-        return [[False,None,None]]
+        print("haven't found any with xzing in the whole image, try two step detection")
+        return two_step_detection(file)
 
 
 def main(filename):
@@ -67,7 +102,7 @@ def main(filename):
             valid, parsed, point = found_qr_code
 
             if valid:
-                print("qr found in", file, parsed)
+                print("qr found in", file, parsed,point)
 
                 #do stuff now...
 
@@ -94,7 +129,7 @@ def main(filename):
                 if parsed.find("/l/") > -1:
                     print("type indicator: l/ = locally defined payload")
                     my_gcp_id = parsed.split("l/")[1]
-                    print("gcp id", my_gcp_id, "in the local my_gcp_list.txt")
+                    #print("gcp id", my_gcp_id, "in the local my_gcp_list.txt")
 
 
                 ## simple locally defined payloads
