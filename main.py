@@ -3,9 +3,17 @@ import os
 import zxing
 from pathlib import Path
 import utm
-from wand.image import Image
+import cv2
+#from PIL import Image
+from pyzbar.pyzbar import decode
+from pyzbar.pyzbar import ZBarSymbol
 
 import gcposm.utils
+
+
+def create_dir(path):
+    if not os.path.exists(path):
+        os.makedirs(path)
 
 
 def load_your_gcp_list(file):
@@ -19,63 +27,81 @@ def load_your_gcp_list(file):
 
     return gcp_list
 
-def two_step_detection(file):
-    tmp_file_name = "/tmp/temporary_file.jpg"
-    img = Image(filename=file)
-    # TODO implement zbar and boundaries generation
-    edges = [[2300,766],[2018,1148],[2400,1471],[2722,1088]]
-    print("found qr code with edges: ",edges)
-    x_points = list(map(lambda item: item[0], edges))
-    y_points = list(map(lambda item: item[1], edges))
-    boundaries = [[min(x_points),min(y_points)],[max(x_points),max(y_points)]]
-    size = [boundaries[1][0] - boundaries[0][0],boundaries[1][1] - boundaries[0][1]]
-    #fraction of the QR Code size, that will be added around the boundaries for cropping
-    margin = 0.2 # 30%
-    boundaries = [[boundaries[0][0] - size[0]*margin,boundaries[0][1] - size[1]*margin],[boundaries[1][0] + size[0]*margin,boundaries[1][1] + size[1]*margin]]
-    boundaries = [list(map(lambda item: int(max([item,0])),boundaries[0])),[int(min([boundaries[1][0],img.width])),int(min([boundaries[1][1],img.height]))]]
-    print("crop to ",boundaries)
-    img.crop(boundaries[0][0],boundaries[0][1],boundaries[1][0],boundaries[1][1])
-    img.format = 'jpeg'
-    img.save(filename=tmp_file_name)
-    
+
+def two_step_detection(im_thresh, code):
+    tmp_path = "tmp" + os.sep
+    create_dir(tmp_path)
+    tmp_file_name = tmp_path + "temporary_file.jpg"
+
+    # zbar and boundaries generation
+    edge_1 = int(code.rect.height * 0.08)
+    corner_top = code.rect.top - edge_1
+    if corner_top < 0:
+        corner_top = 0
+
+    corner_bottom = code.rect.top + code.rect.height + edge_1
+    if corner_bottom >= len(im_thresh):
+        corner_bottom = len(im_thresh) - 1
+
+    edge_2 = int(code.rect.width * 0.08)
+    corner_left = code.rect.left - edge_2
+    if corner_left < 0 :
+        corner_left = 0
+
+    corner_right = code.rect.left + code.rect.width + edge_2
+    if corner_right >= len(im_thresh[0]):
+        corner_right = len(im_thresh[0]) - 1
+
+
+    # zxing needs an image file, so we store one temporary one for it
+    cv2.imwrite(tmp_file_name, im_thresh[corner_top : corner_bottom, corner_left : corner_right])
+
+    # zxing doesn't like windows separator and other strange characters, so we just change it
+    tmp_file_name = Path(tmp_file_name)
+    tmp_file_name = tmp_file_name.absolute().as_uri()
     reader = zxing.BarCodeReader()
-    barcode = reader.decode(tmp_file_name, True)
-    
-    if barcode is not None:
+    barcode = reader.decode(tmp_file_name, True) # filename, try_harder, does not handle exceptions yet, when the file is NOT an image
+
+    if barcode.format is not None:
         valid = barcode.format is not None and barcode.format == "QR_CODE"
-        print("decoded qr code in two step detection")
         content = barcode.parsed
-        point = [barcode.points[1][0] + boundaries[0][0],barcode.points[1][1] + boundaries[0][1]]
-        return [[valid, content, point]]
+        point = [corner_left + barcode.points[1][0], corner_top + barcode.points[1][1]]
+        return [valid, content, point]
     else:
-        return [[False,None,None]]
-    
-    
+        return [False,None,None]
+
     
 
 def get_qr_codes(file):
-    # zxing doesn't like windows separator and other strange characters, so we just change it
-    file = Path(file)
-    file = file.absolute().as_uri()
 
-    reader = zxing.BarCodeReader()
-    barcode = reader.decode(file, True)
-    # filename, try_harder = True
-    # does not handle exceptions yet, when the file is NOT an image
-    print(barcode)
+    # todo here we could implement more color manipulation to search again in the same image with different threshold
+    im_color = cv2.imread(file, cv2.IMREAD_COLOR)
+    im_gray = cv2.cvtColor(im_color, cv2.COLOR_BGR2GRAY)
+    image_threshold = 128 #  int(np.max(im_gray))-25
+    ret, im_thresh = cv2.threshold(im_gray, image_threshold, 255, cv2.THRESH_BINARY)  #, 255, cv2.THRESH_BINARY)
 
-    # TODO check if QR Code
-    if barcode is not None:
-        valid = barcode.format is not None and barcode.format == "QR_CODE"
-        content = barcode.parsed
-        point = barcode.points[1]
-        return [[valid, content, point]]
+    code_detection = decode(im_thresh, symbols=[ZBarSymbol.QRCODE])
+    # https://github.com/NaturalHistoryMuseum/pyzbar/issues/29
+    # when symbols=[ZBarSymbol.QRCODE], it checks for all code formats, including barcodes
+    # instead of im_thresh, also Image.open(file)
+
+
+    found_qr_codes = []
+    if len(code_detection) > 0:
+        for code in code_detection:
+            found_qr_codes.append(two_step_detection(im_thresh, code))
+        return found_qr_codes
+
     else:
-        print("haven't found any with xzing in the whole image, try two step detection")
-        return two_step_detection(file)
+        print("haven't found any qr-codes in the whole image")
+        return [[False, None, None]]
+
 
 
 def main(filename):
+
+    print("Hello, starting GCP-OSM...")
+    print("")
 
     # preparation
     gcp_list = load_your_gcp_list("my_gcp_list.txt")
@@ -98,6 +124,8 @@ def main(filename):
 
     for file in processing_files:
         found_qr_codes = get_qr_codes(file)
+
+
         for found_qr_code in found_qr_codes:
             valid, parsed, point = found_qr_code
 
@@ -156,6 +184,8 @@ def main(filename):
 
 
     f.close()
+    print("")
+    print("GCP-OSM is finished, Good Bye!")
 
 
 def getArgs():
