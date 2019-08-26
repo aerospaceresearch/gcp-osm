@@ -28,6 +28,40 @@ def load_your_gcp_list(file):
     return gcp_list
 
 
+def find_qr_code_bobble(center, reference):
+
+    positions = []
+    positions_index = []
+
+    for i in range(len(center)):
+        if reference[i] != 0:
+            positions.append(center[i])
+            positions_index.append(i)
+
+
+    angles = []
+    angles_index = []
+
+    for i in range(-1, len(positions)-1):
+        a = np.array(positions[i - 1])
+        b = np.array(positions[i])
+        c = np.array(positions[i + 1])
+
+        ba = a - b
+        bc = c - b
+
+        cosine_angle = np.dot(ba, bc) / (np.linalg.norm(ba) * np.linalg.norm(bc))
+        angle = np.arccos(cosine_angle)
+
+        angles.append(np.degrees(angle))
+        angles_index.append(positions_index[i])
+
+    reference[angles_index[np.argmax(angles)]] = 2
+
+    return reference
+
+
+
 def two_step_detection(im_color, im_thresh, code):
     tmp_path = "tmp" + os.sep
     create_dir(tmp_path)
@@ -57,10 +91,13 @@ def two_step_detection(im_color, im_thresh, code):
     cv2.imwrite(tmp_file_name, im_thresh[corner_top : corner_bottom, corner_left : corner_right])
 
     center, area, reference = find_centers(im_thresh[corner_top : corner_bottom, corner_left : corner_right])
+
+    reference = find_qr_code_bobble(center, reference)
+
     for i in range(len(center)):
         #print("gg", corner_left + center[i][0], corner_top + center[i][1])
 
-        if reference[i] == 1:
+        if reference[i] == 2:
             cv2.circle(im_color, (int(np.round(corner_left + center[i][0])), int(np.round(corner_top + center[i][1]))), 9, (0, 255, 0), -1)
 
     # zxing doesn't like windows separator and other strange characters, so we just change it
