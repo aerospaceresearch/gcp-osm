@@ -7,7 +7,7 @@ import cv2
 #from PIL import Image
 from pyzbar.pyzbar import decode
 from pyzbar.pyzbar import ZBarSymbol
-
+import numpy as np
 import gcposm.utils
 
 
@@ -28,13 +28,13 @@ def load_your_gcp_list(file):
     return gcp_list
 
 
-def two_step_detection(im_thresh, code):
+def two_step_detection(im_color, im_thresh, code):
     tmp_path = "tmp" + os.sep
     create_dir(tmp_path)
     tmp_file_name = tmp_path + "temporary_file.jpg"
 
     # zbar and boundaries generation
-    edge_1 = int(code.rect.height * 0.08)
+    edge_1 = int(code.rect.height * 0.06)
     corner_top = code.rect.top - edge_1
     if corner_top < 0:
         corner_top = 0
@@ -43,7 +43,7 @@ def two_step_detection(im_thresh, code):
     if corner_bottom >= len(im_thresh):
         corner_bottom = len(im_thresh) - 1
 
-    edge_2 = int(code.rect.width * 0.08)
+    edge_2 = int(code.rect.width * 0.06)
     corner_left = code.rect.left - edge_2
     if corner_left < 0 :
         corner_left = 0
@@ -56,6 +56,13 @@ def two_step_detection(im_thresh, code):
     # zxing needs an image file, so we store one temporary one for it
     cv2.imwrite(tmp_file_name, im_thresh[corner_top : corner_bottom, corner_left : corner_right])
 
+    center, area, reference = find_centers(im_thresh[corner_top : corner_bottom, corner_left : corner_right])
+    for i in range(len(center)):
+        #print("gg", corner_left + center[i][0], corner_top + center[i][1])
+
+        if reference[i] == 1:
+            cv2.circle(im_color, (int(np.round(corner_left + center[i][0])), int(np.round(corner_top + center[i][1]))), 9, (0, 255, 0), -1)
+
     # zxing doesn't like windows separator and other strange characters, so we just change it
     tmp_file_name = Path(tmp_file_name)
     tmp_file_name = tmp_file_name.absolute().as_uri()
@@ -66,6 +73,8 @@ def two_step_detection(im_thresh, code):
         valid = barcode.format is not None and barcode.format == "QR_CODE"
         content = barcode.parsed
         point = [corner_left + barcode.points[1][0], corner_top + barcode.points[1][1]]
+        cv2.circle(im_color, (int(point[0]), int(point[1])), 4, (0, 0, 255), -1)
+        cv2.imwrite(tmp_path + "tmp_centers.jpg", im_color)
         return [valid, content, point]
     else:
         return [False,None,None]
@@ -77,8 +86,10 @@ def get_qr_codes(file):
     # todo here we could implement more color manipulation to search again in the same image with different threshold
     im_color = cv2.imread(file, cv2.IMREAD_COLOR)
     im_gray = cv2.cvtColor(im_color, cv2.COLOR_BGR2GRAY)
-    image_threshold = 128 #  int(np.max(im_gray))-25
+    image_threshold = 128 #int(np.mean(im_gray))
+
     ret, im_thresh = cv2.threshold(im_gray, image_threshold, 255, cv2.THRESH_BINARY)  #, 255, cv2.THRESH_BINARY)
+    #cv2.imwrite("test.jpg", im_thresh)
 
     code_detection = decode(im_thresh, symbols=[ZBarSymbol.QRCODE])
     # https://github.com/NaturalHistoryMuseum/pyzbar/issues/29
@@ -89,13 +100,66 @@ def get_qr_codes(file):
     found_qr_codes = []
     if len(code_detection) > 0:
         for code in code_detection:
-            found_qr_codes.append(two_step_detection(im_thresh, code))
+            found_qr_codes.append(two_step_detection(im_color, im_thresh, code))
         return found_qr_codes
 
     else:
         print("haven't found any qr-codes in the whole image")
         return [[False, None, None]]
 
+
+def hops(hierarchy, index):
+    counter = 0
+
+    if index != -1:
+        while hierarchy[0][index][3] > 0:
+            #print(counter, index, hierarchy[0][index][3])
+
+            index = hierarchy[0][index][3]
+            counter += 1
+
+    return counter
+
+def find_centers(im_thresh):
+    contours, hierarchy = cv2.findContours(im_thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    # print(hierarchy)
+
+    center = []
+    area = []
+
+    for data in range(len(contours)):
+
+        if hierarchy[0][data][3] > 0:
+            if hops(hierarchy, data) >= 3:
+                # print(contours[data])
+                #cv2.drawContours(im_thresh, contours[data], -1, (255, 0, 255), 5)
+
+                M = cv2.moments(contours[data])
+
+                # calculate x,y coordinate of center
+                if M["m00"] > 0.0:
+                    cX = M["m10"] / M["m00"]
+                    cY = M["m01"] / M["m00"]
+
+                    center.append([cX, cY])
+                    area.append(cv2.contourArea(contours[data]))
+
+                    #cv2.circle(im_thresh, (int(cX), int(cY)), 9, (255, 255, 255), -1)
+
+    # sorting the area by the biggest 3 areas.
+    # todo do not know what happens, when not enough areas are found
+    n = 3
+    area_sorted = np.argsort(area)[::-1][:n]
+
+    reference = np.zeros(len(center))
+
+    for i in range(len(area_sorted)):
+        reference[area_sorted[i]] = 1
+
+    #cv2.imwrite("testtest.jpg", im_thresh)
+
+
+    return center, area, reference
 
 
 def main(filename):
