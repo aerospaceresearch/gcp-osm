@@ -87,7 +87,7 @@ class GCPURLParser:
             gcp://osm/gcp/[base64 ground control point id]"""
 
         parsed_url = urlparse(ground_control_point_url)
-        if parsed_url.scheme and not parsed_url.scheme == 'gcp':
+        if parsed_url.scheme and not parsed_url.scheme in ['gcp', 'https']:
             raise Error("Unsupported URL scheme: " + parsed_url.scheme)
 
         assembled_path = parsed_url.path
@@ -96,15 +96,15 @@ class GCPURLParser:
             # since gcp osm urls do not have a host we treat is as being part of the path
             assembled_path = parsed_url.netloc + assembled_path
 
-        id_part = assembled_path.split("/")[-1]
+        id_part = assembled_path.split('/')[-1]
         map_object = None
 
-        if assembled_path.startswith("l/"):
+        if assembled_path.startswith('l/') or assembled_path.startswith('osm.to/l/'):
             # handle local id
             geo_location = self.geo_location_resolver.resolve_from_local_lookup_table(id_part)
             return ClassicGroundControlPoint(geo_location, map_object)
 
-        if assembled_path.startswith("osm/g/"):
+        if assembled_path.startswith('osm/g/') or assembled_path.startswith('osm.to/g/'):
             # handle encoded geo location
             geo_location = self.geo_location_decoder.decode(id_part)
             return ClassicGroundControlPoint(geo_location, map_object)
@@ -113,19 +113,19 @@ class GCPURLParser:
         # handle osm ground control points associated to OSM objects
         decoded_id = decode_base64_id(id_part)
 
-        if assembled_path.startswith("osm/gcp/"):
+        if assembled_path.startswith("osm/gcp/") or assembled_path.startswith('osm.to/gcp/'):
             map_object = OSMGroundControlPointId(decoded_id)
 
-        if assembled_path.startswith("osm/a/"):
+        if assembled_path.startswith("osm/a/") or assembled_path.startswith('osm.to/a/'):
             map_object = OSMAreaId(decoded_id)
 
-        if assembled_path.startswith("osm/n/"):
+        if assembled_path.startswith("osm/n/") or assembled_path.startswith('osm.to/n/'):
             map_object = OSMNodeId(decoded_id)
 
-        if assembled_path.startswith("osm/r/"):
+        if assembled_path.startswith("osm/r/") or assembled_path.startswith('osm.to/r/'):
             map_object = OSMRelationId(decoded_id)
 
-        if assembled_path.startswith("osm/w/"):
+        if assembled_path.startswith("osm/w/") or assembled_path.startswith('osm.to/w/'):
             map_object = OSMWayId(decoded_id)
 
         if map_object is None:

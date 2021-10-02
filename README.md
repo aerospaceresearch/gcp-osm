@@ -52,9 +52,21 @@ The upper left one is the one "in the middle".
 
 ### URL schema
 
-`gcp://<type indicator><payload>`
+`https://osm.to/<type indicator><payload>`
 
 The `<type indicator>` can consist of the following values:
+
+* `n/`, or empty: `<payload>` represents an OSM Node ID in Base64
+* `w/`: `<payload>` represents an OSM Way ID in Base64
+* `a/`: `<payload>` represents an OSM Area Id in Base64
+* `r/`: `<payload>` represents an OSM Relation ID in Base64
+* `g/`: `<payload>` represents coordinates in OSM short link quad tiles format
+* `gcp/` `<payload>` represents the UUID of the Ground Control Point that was attached as tag to an OSM Object
+* `l/`: `<payload>` represents a (locally defined) ID, which during analysis is linked with coordinates
+
+An alternative url format is: `gcp://<type indicator><payload>`
+
+The `<type indicator>` can consist of the following values in this case:
 
 * `osm/n/`, or empty: `<payload>` represents an OSM Node ID in Base64
 * `osm/w/`: `<payload>` represents an OSM Way ID in Base64
@@ -150,9 +162,21 @@ Als Referenzpunkt wird die Mitte des großen Positionmarkers oben links genutzt.
 
 ### URL-Schema
 
-`gcp://<type indicator>/<payload>`
+`https://osm.to/<type indicator>/<payload>`
 
 Der `<type indicator>` kann folgende Wert haben:
+
+* `n/`, bzw keiner: `<payload>` stellt eine OSM Node ID zur Basis 64 dar
+* `w/`: `<payload>` stellt eine OSM Way ID zur Basis 64 dar
+* `a/`: `<payload>` stellt eine OSM Area ID zur Basis 64 dar
+* `r/`: `<payload>` stellt eine OSM Relation ID zur Basis 64 dar
+* `g/`: `<payload>` stellt eine Koordiante im OSM Shortlink quadtiles format
+* `gcp/` `<payload>` stellt die UUID des Ground Control Points dar, welcher an einem OSM Objekt als Tag hinterlegt wurde
+* `l/`: `<payload>` stellt eine (nur lokal definierte) ID da, welche bei der Auswertung mit einer Koordinate verbunden werden muss
+
+Ein alternatives URL-Format ist auch: `gcp://<type indicator>/<payload>`
+
+Der `<type indicator>` kann in diesem Fall folgende Wert haben:
 
 * `osm/n/`, bzw keiner: `<payload>` stellt eine OSM Node ID zur Basis 64 dar
 * `osm/w/`: `<payload>` stellt eine OSM Way ID zur Basis 64 dar
