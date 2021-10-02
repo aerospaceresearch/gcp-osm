@@ -1,4 +1,3 @@
-import argparse
 import os
 import zxing
 import utm
@@ -8,6 +7,7 @@ from pyzbar.pyzbar import decode
 from pyzbar.pyzbar import ZBarSymbol
 
 import gcposm.utils
+import argument_parser
 
 
 def create_dir(path):
@@ -185,29 +185,8 @@ def main(filename):
     print("GCP-OSM is finished, Good Bye!")
 
 
-def getArgs():
-    """
-    defining the input parameters by the arguments.
-
-    src: https://pymotw.com/2/argparse/
-
-    :return: args
-    """
-
-    parser = argparse.ArgumentParser()
-
-    parser.add_argument('-f', '--from', action='store', default=os.sep,
-                        dest='file',
-                        help='load in the file or folder',
-                        required=True)
-
-    # parser.add_argument('--version', action='version', version='0.0')
-
-    return parser.parse_args()
-
 
 if __name__ == '__main__':
-    args = getArgs()
-
+    args = argument_parser.parse_arguments()
 
     main(args.file)
