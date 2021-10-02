@@ -81,7 +81,24 @@ To avoid wasting space the OSM IDs are formatted in Base64 with a character set 
 The character set is `ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_~`, with `A` representing zero, `B` one, and so on.
 The number 64 will be represented as `BA`, 65 as `BB` and so on.
 
+## Project setup
+### Create virtual environment
+`virtualenv -p python3 venv`
 
+### Activate virtual environment
+`source venv/bin/activate`
+
+### Install dependencies
+`pip3 install -r requirements.txt`
+
+### Install pyzbar
+See [pyzbar documentation](https://github.com/NaturalHistoryMuseum/pyzbar#installation)
+
+### Run unittests
+`python3 -m unittest
+
+### Run gcp-osm
+`python3 main.py -f <filepath>`
 
 # German version
 
@@ -160,3 +177,19 @@ Mit 15 Zeichen Quadtiles kommt man auf eine Genauigkeit von 0.3mm am Äquator.
 Um die OSM IDs möglichst platzsparend darzustellen, wird diese zur Basis 64 dargestellt, wobei der Zeichensatz an das OSM Shortlink-Format angelehnt ist. (Das Shortlink-Format nutzt hingegen eine binäre Kodierung wie base64).
 
 Der Zeichensatz ist `ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_~`, wobei `A` die Null, `B` die Eins, usw repräsentiert. Die Zahl 64 wird als `BA` und die 65 als `BB` dargestellt.
+
+## Installieren / ausführen
+### Virtual environment anlegen
+`virtualenv -p python3 venv`
+
+### Virtual environment aktivieren
+`source venv/bin/activate`
+
+### Dependencies installieren
+`pip3 install -r requirements.txt`
+
+### Install pyzbar
+Siehe [pyzbar Dokumentation](https://github.com/NaturalHistoryMuseum/pyzbar#installation)
+
+### gcp-osm ausführen
+`python3 main.py -f <filepath>`
