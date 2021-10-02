@@ -38,5 +38,16 @@ class OSMGroundControlPointId(MapObjectId):
 
 @dataclass
 class GroundControlPoint:
-    centerGeoLocation: GeoLocation
-    mapObject: MapObjectId
+    center_geo_location: GeoLocation
+    map_object: MapObjectId
+
+@dataclass
+class ClassicGroundControlPoint(GroundControlPoint):
+    None
+
+@dataclass
+class OSMGroundControlPoint(GroundControlPoint):
+    upper_left_position_marker: GeoLocation
+    upper_right_position_marker: GeoLocation
+    lower_left_position_marker: GeoLocation
+
