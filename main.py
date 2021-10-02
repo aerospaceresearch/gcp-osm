@@ -33,7 +33,7 @@ def main(filename):
         return
 
     for file in processing_files:
-        found_qr_codes = qr_code_extractor.get_qr_data(file)
+        found_qr_codes = qr_code_extractor.get_qr_data(file, debug_show_image=args.is_debug)
         print(found_qr_codes)
 
     print("")
