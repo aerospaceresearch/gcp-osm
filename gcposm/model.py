@@ -4,13 +4,13 @@ from dataclasses import dataclass
 # @dataclass automatically generates 
 #   - a constructor containing all class attributes as parameters
 #   - an implementation of __repr__() which makes the class printable,
-#       i.e. "GeoLocation(longitude=1, latitude=2, altitude=0.3)" instead of just
+#       i.e. "GeoLocation(latitude=1, longitude=2, altitude_in_meters=0.3)" instead of just
 #       "<__main__.GeoLocation object at 0x7f65a53565b0>"
 @dataclass
 class GeoLocation:
-    longitude: float
     latitude: float
-    altitude: float
+    longitude: float
+    altitude_in_meters: float
 
 @dataclass
 class MapObjectId:

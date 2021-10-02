@@ -16,6 +16,10 @@ def parse_arguments():
                         help='load in the file or folder',
                         required=True)
 
+    parser.add_argument('--debug', action='store_true',
+                        dest='is_debug',
+                        help='Show processed images for debugging purposes')
+
     return parser.parse_args()
 
 if __name__ == '__main__':

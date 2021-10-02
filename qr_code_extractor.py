@@ -1,16 +1,18 @@
 import cv2
 
 
-def get_qr_data(file):
+def get_qr_data(file, debug_show_image=False):
     position_marker_coordinates = None
     input_image = cv2.imread(file, cv2.IMREAD_COLOR)
     payload, bounding_box, rectified_image = cv2.QRCodeDetector().detectAndDecode(input_image)
 
     if len(payload) > 0:
         position_marker_coordinates = get_position_marker_coordinates(bounding_box)
-        cv2.circle(input_image, position_marker_coordinates, 10, (0, 255, 0), -1)
-        cv2.imshow("highlighted image", input_image)
-        cv2.waitKey(0)
+
+        if debug_show_image:
+            cv2.circle(input_image, position_marker_coordinates, 10, (0, 255, 0), -1)
+            cv2.imshow("highlighted image", input_image)
+            cv2.waitKey(0)
 
     return payload, position_marker_coordinates
 
