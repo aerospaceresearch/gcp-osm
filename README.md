@@ -93,6 +93,9 @@ The number 64 will be represented as `BA`, 65 as `BB` and so on.
 ### Install pyzbar
 See [pyzbar documentation](https://github.com/NaturalHistoryMuseum/pyzbar#installation)
 
+### Run unittests
+`python3 -m unittest
+
 ### Run gcp-osm
 `python3 main.py -f <filepath>`
 
