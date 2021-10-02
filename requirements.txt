@@ -1,2 +1,4 @@
 zxing
 utm
+opencv-python
+pyzbar
