@@ -2,7 +2,8 @@
 
 import os
 
-import gcposm.utils
+from gcposm import utils
+
 import argument_parser
 import qr_code_extractor
 
@@ -24,11 +25,11 @@ def main(filename):
     # now working time
     if os.path.isdir(args.file):
         print("loading in all files in folder:", filename)
-        processing_files = gcposm.utils.get_all_files(filename)
+        processing_files = utils.get_all_files(filename)
 
     elif os.path.isfile(args.file):
         print("loading in this file:", filename)
-        processing_files = gcposm.utils.get_one_file(filename)
+        processing_files = utils.get_one_file(filename)
 
     else:
         print("neither file nor folder. ending programm.")
