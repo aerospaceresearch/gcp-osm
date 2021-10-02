@@ -41,7 +41,7 @@ class GCPURLParser_LocalId_Test(TestCase):
             { 'url': 'gcp://l/42' },
             { 'url': 'https://osm.to/l/42' } ]
 
-        expected_geo_location = GeoLocation(longitude=12, latitude=34, altitude=56)
+        expected_geo_location = GeoLocation(latitude=12, longitude=34, altitude_in_meters=56)
         expected_ground_control_point = ClassicGroundControlPoint(expected_geo_location, map_object=None)
 
         geo_location_resolver_spy = MagicMock()
@@ -66,7 +66,7 @@ class GCPURLParser_EncodedGeoLocation_Test(TestCase):
             { 'url': 'gcp://osm/g/specialBase64EncodedGeoLocation' },
             { 'url': 'https://osm.to/g/specialBase64EncodedGeoLocation' } ]
 
-        expected_geo_location = GeoLocation(longitude=12, latitude=34, altitude=56)
+        expected_geo_location = GeoLocation(latitude=12, longitude=34, altitude_in_meters=56)
         expected_ground_control_point = ClassicGroundControlPoint(expected_geo_location, map_object=None)
 
         self.geo_location_decoder_spy.decode = MagicMock(return_value=expected_geo_location)
@@ -85,11 +85,11 @@ class GCPURLParser_OSMGroundControlPoint_Test(TestCase):
         self.geo_location_decoder_stub = MagicMock()
         self.geo_location_resolver_spy = MagicMock()
 
-        self.expected_geo_location = GeoLocation(longitude=12, latitude=34, altitude=56)
+        self.expected_geo_location = GeoLocation(latitude=12, longitude=34, altitude_in_meters=56)
         self.expected_geo_locations_of_position_markers = [
-            GeoLocation(longitude=11, latitude=11, altitude=11), # upper left position marker
-            GeoLocation(longitude=22, latitude=22, altitude=22), # upper right position marker
-            GeoLocation(longitude=33, latitude=33, altitude=33)  # lower left position marker
+            GeoLocation(latitude=11, longitude=11, altitude_in_meters=11), # upper left position marker
+            GeoLocation(latitude=22, longitude=22, altitude_in_meters=22), # upper right position marker
+            GeoLocation(latitude=33, longitude=33, altitude_in_meters=33)  # lower left position marker
         ]
 
         self.geo_location_resolver_spy.resolve = MagicMock(return_value=self.expected_geo_location)
