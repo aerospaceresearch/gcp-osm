@@ -1,7 +1,6 @@
 import argparse
 import os
 import zxing
-from pathlib import Path
 import utm
 import cv2
 #from PIL import Image
@@ -57,12 +56,10 @@ def two_step_detection(im_thresh, code):
     cv2.imwrite(tmp_file_name, im_thresh[corner_top : corner_bottom, corner_left : corner_right])
 
     # zxing doesn't like windows separator and other strange characters, so we just change it
-    tmp_file_name = Path(tmp_file_name)
-    tmp_file_name = tmp_file_name.absolute().as_uri()
     reader = zxing.BarCodeReader()
-    barcode = reader.decode(tmp_file_name, True) # filename, try_harder, does not handle exceptions yet, when the file is NOT an image
+    barcode = reader.decode(tmp_file_name) # filename, try_harder, does not handle exceptions yet, when the file is NOT an image
 
-    if barcode.format is not None:
+    if barcode is not None and barcode.format is not None:
         valid = barcode.format is not None and barcode.format == "QR_CODE"
         content = barcode.parsed
         point = [corner_left + barcode.points[1][0], corner_top + barcode.points[1][1]]
