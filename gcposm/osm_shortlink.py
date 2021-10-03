@@ -105,10 +105,10 @@ def _deinterleave(codeEndcode):
             x = ((x | tmp)  << 1)
             tmp = (codeEndcode >> (i-1)) & 1
             y = ((y | tmp)  << 1)            
-           # x = x << 1
-            print( ((codeEndcode ) & (2**i )))
-            print("codeEndcode << i",codeEndcode << i)
-            print("x",x << 1)
+            # x = x << 1
+            # print( ((codeEndcode ) & (2**i )))
+            # print("codeEndcode << i",codeEndcode << i)
+            # print("x",x << 1)
         x = x << 1 # check why last shift it necessary
         # convert to long und lat
         lon = y / 2**32*360 -180
