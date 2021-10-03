@@ -36,7 +36,7 @@ def main(filename):
             if id != entry_id:
                 continue
 
-            return model.GeoLocation(latitude, longitude, altitude_in_meters)
+            return model.GeoLocation(float(latitude), float(longitude), float(altitude_in_meters))
 
         raise Exception("Id not found in lookup table: " + id)
 
