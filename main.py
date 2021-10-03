@@ -7,6 +7,7 @@ from gcposm import utils
 from gcposm import model
 
 from gcposm.gcp_url_parser import GCPURLParser, GeoLocationResolver, GeoLocationDecoder
+from gcposm.gcp_list_writer import write_gcp_list_file
 
 import argument_parser
 import qr_code_extractor
@@ -58,12 +59,20 @@ def main(filename):
         print("neither file nor folder. ending programm.")
         return
 
+    gcp_tuples_to_write = []
+
     for file in processing_files:
         found_qr_codes = qr_code_extractor.get_qr_data(file, debug_show_image=args.is_debug)
         print(str(found_qr_codes) + " -> ", end='')
 
         [gcp_url, upper_left_position_marker_pixel_coordinates] = found_qr_codes
-        print(gcp_url_parser.parse(gcp_url))
+        ground_control_point = gcp_url_parser.parse(gcp_url)
+        print(ground_control_point)
+
+        gcp_tuples_to_write.append( (file, ground_control_point.center_geo_location, *upper_left_position_marker_pixel_coordinates) )
+
+    print("writing gcp list to " + args.output_file);
+    write_gcp_list_file(args.output_file, gcp_tuples_to_write)
 
     print("")
     print("GCP-OSM is finished, Good Bye!")

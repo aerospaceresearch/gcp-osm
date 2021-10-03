@@ -162,7 +162,7 @@ Als Referenzpunkt wird die Mitte des großen Positionmarkers oben links genutzt.
 
 ### URL-Schema
 
-`https://osm.to/<type indicator>/<payload>`
+`https://osm.to/<type indicator><payload>`
 
 Der `<type indicator>` kann folgende Wert haben:
 
@@ -174,7 +174,7 @@ Der `<type indicator>` kann folgende Wert haben:
 * `gcp/` `<payload>` stellt die UUID des Ground Control Points dar, welcher an einem OSM Objekt als Tag hinterlegt wurde
 * `l/`: `<payload>` stellt eine (nur lokal definierte) ID da, welche bei der Auswertung mit einer Koordinate verbunden werden muss
 
-Ein alternatives URL-Format ist auch: `gcp://<type indicator>/<payload>`
+Ein alternatives URL-Format ist auch: `gcp://<type indicator><payload>`
 
 Der `<type indicator>` kann in diesem Fall folgende Wert haben:
 

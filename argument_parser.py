@@ -16,6 +16,10 @@ def parse_arguments():
                         help='load in the file or folder',
                         required=True)
 
+    parser.add_argument('-o', '--output-file', action='store', default='gcp_list.txt',
+                        dest='output_file',
+                        help='name of the output file (default: gcp-list.txt)')
+
     parser.add_argument('--debug', action='store_true',
                         dest='is_debug',
                         help='Show processed images for debugging purposes')
