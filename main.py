@@ -66,10 +66,11 @@ def main(filename):
         print(str(found_qr_codes) + " -> ", end='')
 
         [gcp_url, upper_left_position_marker_pixel_coordinates] = found_qr_codes
-        ground_control_point = gcp_url_parser.parse(gcp_url)
-        print(ground_control_point)
+        if gcp_url != '' and upper_left_position_marker_pixel_coordinates is not None:
+            ground_control_point = gcp_url_parser.parse(gcp_url)
+            print(ground_control_point)
 
-        gcp_tuples_to_write.append( (file, ground_control_point.center_geo_location, *upper_left_position_marker_pixel_coordinates) )
+            gcp_tuples_to_write.append( (file, ground_control_point.center_geo_location, *upper_left_position_marker_pixel_coordinates) )
 
     print("writing gcp list to " + args.output_file);
     write_gcp_list_file(args.output_file, gcp_tuples_to_write)
