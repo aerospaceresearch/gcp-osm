@@ -83,7 +83,7 @@ class GCPURLParser:
 
         parsed_url = urlparse(ground_control_point_url)
         if parsed_url.scheme and not parsed_url.scheme in ['gcp', 'https']:
-            raise Error("Unsupported URL scheme: " + parsed_url.scheme)
+            raise Exception("Unsupported URL scheme: " + parsed_url.scheme)
 
         assembled_path = parsed_url.path
         if parsed_url.netloc:
@@ -124,7 +124,7 @@ class GCPURLParser:
             map_object = OSMWayId(decoded_id)
 
         if map_object is None:
-            raise Error("unsupported path format: " + path)
+            raise Exception("unsupported path format: " + path)
 
         geo_location = self.geo_location_resolver.resolve(map_object)
         position_marker_geo_locations = self.geo_location_resolver.resolve_position_markers_of_qr_code(map_object)
