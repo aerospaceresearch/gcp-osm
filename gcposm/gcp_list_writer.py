@@ -29,7 +29,7 @@ def write_gcp_list_file(file_name, tuples: Iterable[tuple[str, GeoLocation, int,
 
     # prepare projection
     proj_string = "+proj=utm +zone=10 +ellps=WGS84 +datum=WGS84 +units=m +no_defs\n"
-    transformer = Transformer.from_crs(crs_from="+proj=latlon", crs_to="+proj=utm +zone=10 +ellps=WGS84 +datum=WGS84 +units=m +no_defs")
+    transformer = Transformer.from_crs(crs_from="+proj=latlon", crs_to=proj_string)
 
     # write information about projection that was applied to the geo coordinates
     file.write(proj_string)
