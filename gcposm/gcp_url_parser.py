@@ -1,17 +1,7 @@
 from typing import Callable
 from urllib.parse import urlparse
 
-from .model import MapObjectId
-from .model import OSMAreaId
-from .model import OSMNodeId
-from .model import OSMRelationId
-from .model import OSMWayId
-from .model import OSMGroundControlPointId
-
-from .model import ClassicGroundControlPoint
-from .model import OSMGroundControlPoint
-
-from .model import GeoLocation
+from .model import *
 
 from .osm_shortlink import shortlinkToGeoLoc
 
@@ -27,27 +17,27 @@ class GeoLocationResolver:
 
     def resolve_from_local_lookup_table(self, id: str) -> GeoLocation:
         """resolves the center gelocation of an OSM ground control point identified by a local lookup table id.
-    
+
         Keyword arguments:
-    
+
         id -- id to be searched for within the local lookup table"""
         return self.local_lookup(id)
 
     def resolve(self, map_object: MapObjectId) -> GeoLocation:
         """resolves the center gelocation of an OSM ground control point.
-    
+
         Keyword arguments:
-    
+
         map_object -- id of the map object associated to the ground control point"""
         raise NotImplementedError()
 
     def resolve_position_markers_of_qr_code(self, map_object: MapObjectId) -> [GeoLocation, GeoLocation, GeoLocation]:
         """resolves the gelocations of an OSM ground control point.
-    
+
         Keyword arguments:
-    
+
         map_object -- id of the map object associated to the ground control point
-    
+
         Returns:
             [   upper_left_position_mark: GeoLocation,
                 upper_right_position_mark: GeoLocation, 
@@ -63,20 +53,22 @@ class GeoLocationDecoder:
 
         Keyword arguments:
         base64 -- string to decode"""
-    
-        return shortlinkToGeoLoc(base64)
 
+        longitude, latitude = shortlinkToGeoLoc(base64)
+
+        # how to determine altitude from short links?
+        return GeoLocation(latitude, longitude, altitude_in_meters=0)
 
 class GCPURLParser:
     def __init__(self, geo_location_resolver: GeoLocationResolver, geo_location_decoder: GeoLocationDecoder):
         """Keyword arguments:
-        
+
         geo_location_resolver -- instance of GeoLocationResolver
         geo_location_decoder -- instance of GeoLocationDecoder"""
         self.geo_location_resolver = geo_location_resolver
         self.geo_location_decoder = geo_location_decoder
-    
-    def parse(self, ground_control_point_url: str) -> GeoLocation:
+
+    def parse(self, ground_control_point_url: str) -> GroundControlPoint:
         """Parses and resolves geo location information for a given ground control point url.
 
         Keyword arguments:
