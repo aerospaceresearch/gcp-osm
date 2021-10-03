@@ -13,6 +13,8 @@ from .model import OSMGroundControlPoint
 
 from .model import GeoLocation
 
+from .osm_shortlink import shortlinkToGeoLoc
+
 from .utils import decode_base64_id
 
 
@@ -61,7 +63,8 @@ class GeoLocationDecoder:
 
         Keyword arguments:
         base64 -- string to decode"""
-        raise NotImplementedError()
+    
+        return shortlinkToGeoLoc(base64)
 
 
 class GCPURLParser:
