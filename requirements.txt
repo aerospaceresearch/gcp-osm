@@ -1,4 +1,5 @@
 zxing
 utm
 opencv-python
+pyproj
 pyzbar
