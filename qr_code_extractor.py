@@ -11,6 +11,8 @@ def get_qr_data(file, debug_show_image=False):
 
         if debug_show_image:
             cv2.circle(input_image, position_marker_coordinates, 10, (0, 255, 0), -1)
+            cv2.namedWindow('highlighted image', cv2.WINDOW_KEEPRATIO)
+            cv2.resizeWindow('highlighted image', 1280, 960)
             cv2.imshow("highlighted image", input_image)
             cv2.waitKey(0)
 
