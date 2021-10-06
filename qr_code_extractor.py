@@ -8,7 +8,7 @@ def get_qr_data(file, debug_show_image=False):
     payload, bounding_box, rectified_image = cv2.QRCodeDetector().detectAndDecode(input_image)
 
     if len(payload) > 0:
-        position_marker_coordinates = get_position_marker_coordinates(bounding_box)
+        position_marker_coordinates = get_position_marker_coordinates(input_image)
 
         if debug_show_image:
             cv2.circle(input_image, position_marker_coordinates, 10, (0, 255, 0), -1)
@@ -35,17 +35,14 @@ def get_qr_data(file, debug_show_image=False):
     return payload, position_marker_coordinates
 
 
-def get_position_marker_coordinates(bounding_box):
-    upper_left_x = int(bounding_box[0][0][0])
-    upper_left_y = int(bounding_box[0][0][1])
-
-    lower_right_x = int(bounding_box[0][2][0])
-    lower_right_y = int(bounding_box[0][2][1])
-
-    # TODO the detection of the position marker can be optimized by using contours
-    center_x = upper_left_x + int((lower_right_x - upper_left_x) / 25 * 3)
-    center_y = upper_left_y + int((lower_right_y - upper_left_y) / 25 * 3)
-
+def get_position_marker_coordinates(input_image):
+    threshed_img = cv2.threshold(cv2.cvtColor(input_image, cv2.COLOR_BGR2GRAY), 60, 255, cv2.THRESH_BINARY)[1]
+    contours = cv2.findContours(threshed_img, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)[0]
+    for c in contours:
+        # compute the center of the contour
+        M = cv2.moments(c)
+        center_x = int(M["m10"] / M["m00"])
+        center_y = int(M["m01"] / M["m00"])
     return center_x, center_y
 
 
