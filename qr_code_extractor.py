@@ -9,9 +9,8 @@ def get_qr_data(file, debug_show_image=False):
     input_image = cv2.imread(file, cv2.IMREAD_COLOR)
     payload, bounding_box, rectified_image = cv2.QRCodeDetector().detectAndDecode(input_image)
 
-
     if len(payload) > 0:
-        position_marker_coordinates = get_position_marker_coordinates(bounding_box)
+        position_marker_coordinates_linear = get_position_marker_coordinates(bounding_box)
 
         # get the corner pixel of the qr image
         x_min = int(np.floor(np.min(bounding_box[0][:, 1]))) - 10
@@ -141,12 +140,9 @@ def get_qr_data(file, debug_show_image=False):
 
         cv2.circle(input_image, [y_min + int(y3), x_min + int(x3)], 30, (255, 0, 255), -1)
 
-
-
-
-
-
-
+        position_marker_coordinates_area = y_min + y1, x_min + x1
+        #maybe there needs to be a selection between the linear and the area cluster method
+        position_marker_coordinates = position_marker_coordinates_area
 
 
         if debug_show_image:
@@ -188,8 +184,9 @@ def get_qr_data(file, debug_show_image=False):
             plt.show()
 
 
-            
-            cv2.circle(input_image, position_marker_coordinates, 10, (0, 0, 255), -1)
+            circle_x = int(position_marker_coordinates[0])
+            circle_y = int(position_marker_coordinates[1])
+            cv2.circle(input_image,[circle_x, circle_y] , 10, (0, 0, 255), -1)
 
             base = input_image.shape[0]
             if base < input_image.shape[1]:
