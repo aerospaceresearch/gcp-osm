@@ -3,3 +3,6 @@ utm
 opencv-python
 pyproj
 pyzbar
+scikit-image
+numpy
+matplotlib
