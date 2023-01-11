@@ -5,7 +5,7 @@ An automated solution for detection and location of [Ground Control Points](http
 
 ## Motivation
 
-Wie should a human, when creating photogrammetry, search for GCPs in images and georeference them manually?
+Why should a human, when creating photogrammetry, search for GCPs in images and georeference them manually?
 With QR codes we have multiple possibilities to automate that process.
 
 ## Possible usage of QR codes
